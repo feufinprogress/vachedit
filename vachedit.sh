@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# La première ligne d'un script bash s'appelle un shebang : 
+# elle sert simplement à indiquer l'endroit ou se trouve le shell pour executer le script.
+
 # Gère l'épaisseur et la construction du panneau, en fonction du nombre de charactères.
 function display_sign() {
   local message="$1"
@@ -55,18 +58,23 @@ while getopts "a:l" opt; do
   esac
 done
 
-shift $((OPTIND-1)) #Ligne necessaire pour écrire sans guillemets 
+shift $((OPTIND-1)) #Ligne necessaire pour écrire sans guillemets après cowsay
 
-# Check si le fichier existe. Si non, renvoie une erreur.
+# Vérifie si le fichier existe. Si non, renvoie une erreur.
 ascii_path=~/bin/vachedit/ascii/"$ascii_file"
 if [ ! -f "$ascii_path" ]; then
   echo "Erreur: le fichier '$ascii_file' n'existe pas." >&2
   exit 1
 fi
 
-# Execute la commande
+# Âffiche un message d'aide si la commande est utilisée sans arguments
 if [ $# -eq 0 ]; then
-  echo "Utilisation : vachedit (-a personnage) [message]"
+  echo -e "\033[1m\033[4mUtilisation\033[0m: "
+  echo "    vachedit [OPTIONS] 'Texte' "
+  echo ""
+  echo -e "\033[1m\033[4mOptions\033[0m:"
+  echo "    -l           Liste tous les personnages disponibles"
+  echo "    -a [option]  Spécifie un personnage à utiliser"
   exit 1
 fi
 

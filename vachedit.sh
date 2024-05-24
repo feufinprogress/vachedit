@@ -9,7 +9,7 @@ function display_sign() {
   local length=${#message}
   local border=""
 
-  for (( i=0; i<(length+0); i++ )); do
+  for (( i=0; i<length; i++ )); do
     border="${border}_"
   done
 
@@ -18,14 +18,12 @@ function display_sign() {
   echo "\\$border/"
 }
 
-# Fichier Ascii utilisé si aucun argument n'est donné à la fonction.
-default_ascii_file="vache.txt"
-ascii_file="$default_ascii_file"
+# Répertoire des fichiers ASCII et de texte
 ascii_dir=~/bin/vachedit/ascii
+text_dir=~/bin/vachedit/text
 
 # Fonction pour lister tous les personnages ascii
 list_ascii_files() {
-  local ascii_dir=~/bin/vachedit/ascii
   local files=("$ascii_dir"/*.txt)
   local file_names=()
 
@@ -35,6 +33,20 @@ list_ascii_files() {
 
   echo "Personnages disponibles :"
   echo "${file_names[*]}"
+}
+
+# Fonction pour choisir un fichier ASCII aléatoire
+choose_random_ascii() {
+  local files=("$ascii_dir"/*.txt)
+  local random_index=$((RANDOM % ${#files[@]}))
+  echo "${files[$random_index]}"
+}
+
+# Fonction pour choisir un texte aléatoire
+choose_random_text() {
+  local files=("$text_dir"/*.txt)
+  local random_index=$((RANDOM % ${#files[@]}))
+  cat "${files[$random_index]}"
 }
 
 # Executer la fonction
@@ -58,27 +70,26 @@ while getopts "a:l" opt; do
   esac
 done
 
-shift $((OPTIND-1)) #Ligne necessaire pour écrire sans guillemets après cowsay
+shift $((OPTIND-1)) # Ligne nécessaire pour écrire sans guillemets après cowsay
 
-# Vérifie si le fichier existe. Si non, renvoie une erreur.
-ascii_path=~/bin/vachedit/ascii/"$ascii_file"
-if [ ! -f "$ascii_path" ]; then
-  echo "Erreur: le fichier '$ascii_file' n'existe pas." >&2
-  exit 1
-fi
-
-# Âffiche un message d'aide si la commande est utilisée sans arguments
-if [ $# -eq 0 ]; then
-  echo -e "\033[1m\033[4mUtilisation\033[0m: "
-  echo "    vachedit [OPTIONS] 'Texte' "
-  echo ""
-  echo -e "\033[1m\033[4mOptions\033[0m:"
-  echo "    -l           Liste tous les personnages disponibles"
-  echo "    -a [option]  Spécifie un personnage à utiliser"
-  exit 1
-fi
-
-# Affiche le message
-message="$*"
-display_sign "$message"
-cat "$ascii_path"
+# Boucle infinie pour afficher un message aléatoire avec un art ASCII aléatoire
+while true; do
+  # Choisir un fichier ASCII aléatoire
+  ascii_path=$(choose_random_ascii)
+  
+  # Vérifie si le fichier existe. Si non, renvoie une erreur.
+  if [ ! -f "$ascii_path" ]; then
+    echo "Erreur: le fichier '$ascii_file' n'existe pas." >&2
+    exit 1
+  fi
+  
+  # Choisir un texte aléatoire
+  message=$(choose_random_text)
+  
+  # Affiche le message et le fichier ASCII
+  display_sign "$message"
+  cat "$ascii_path"
+  
+  # Attendre 0.75 secondes avant de recommencer
+  sleep 0.75
+done

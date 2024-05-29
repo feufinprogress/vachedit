@@ -49,6 +49,17 @@ choose_random_text() {
   cat "${files[$random_index]}"
 }
 
+# Hide the cursor
+tput civis
+
+# Function to show the cursor before exiting
+function cleanup {
+  tput cnorm
+}
+
+# Ensure the cursor is shown again on script exit
+trap cleanup EXIT
+
 # Executer la fonction
 while getopts "a:l" opt; do
   case $opt in
